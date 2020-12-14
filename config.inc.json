@@ -1,0 +1,13 @@
+{
+  "port": 1234,
+  "ipc": {
+    "secret": ""
+  },
+  "oauth": {
+    "clientID": "",
+    "clientSecret": "",
+    "redirectURL": ""
+  },
+  "frontend": "http://localhost:3000",
+  "jwt": ""
+}
