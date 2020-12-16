@@ -1,6 +1,5 @@
 const fetch = require('node-fetch')
 const config = require('../../../config.json')
-const safeFetch = require("../../util/safeFetch");
 const jwt = require('jsonwebtoken')
 
 module.exports = {
@@ -19,18 +18,9 @@ module.exports = {
                 scope: 'identify guilds'
             })
         }).then(res => res.json())
+        response.expiresAt = Date.now() + response.expires_in
         if (res.error) return res.redirect(config.frontend)
-        const tokenData = {}
-        tokenData.token = response
-        response = await safeFetch('https://discord.com/api/v8/users/@me', {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                Authorization: `${response.token_type} ${response.access_token}`
-            }
-        })
-        if (response.message) return res.redirect(config.frontend)
-        tokenData.user = response
-        const token = jwt.sign(tokenData, config.jwt)
+        const token = jwt.sign(response, config.jwt)
         res.redirect(config.frontend + '/auth/callback?token=' + token)
     }
 }
