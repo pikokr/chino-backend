@@ -6,10 +6,24 @@ const jwt = require('jsonwebtoken')
 const safeFetch = require("./util/safeFetch");
 const fetch = require('node-fetch')
 const cors = require('cors')
-
+const http = require("http");
 const app = express()
 
+const server = http.createServer(app)
+
 app.use(cors())
+
+const io = require('socket.io')(server)
+
+io.use((socket, fn) => {
+    if (!socket.handshake.query.auth) return socket.disconnect(true)
+    if (socket.handshake.query.auth !== config.ipc.secret) return socket.disconnect(true)
+    fn()
+})
+
+io.on('connection', socket => {
+    console.log(socket.id)
+})
 
 app.use(async (req, res, next) => {
     let user
@@ -87,4 +101,4 @@ function register(dir, route = '/') {
 
 register(path.join(__dirname, 'routes'))
 
-app.listen(config.port)
+server.listen(config.port)
